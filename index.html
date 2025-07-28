@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <link rel="icon" type="image/png" href="https://www.lobs.fr/uploads/favicon.png" sizes="32x32">
+  <script>
+    (function(){ emailjs.init('MeBHBDCBqY5lMTJK7'); })();
+  </script>
+  <title>Prévisions de Commande</title>
+  <style>
+
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+    /* NE PAS TOUCHER AU ELEMENTS STYLE */
+
+
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; background-color: whitesmoke; }
+    .incomplete-box { background-color: orange; }
+    .monthly-input {
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+    }
+  
+    body, input, button, label, table {
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    body{
+      background-color: #D6EFFF;
+    }
+    
+    input[type="text"],
+    input[type="number"],
+    .input {
+      background-color: #ffffff;
+    }
+  
+
+  /* L'entête */
+  header {
+    position: sticky;
+    top: 0; left: 0; right: 0;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    align-items: center;
+    padding: 20px;
+    background: #D6EFFF;
+    z-index: 1000;
+    margin: 0;
+    border-bottom: 2px solid #000;
+  }
+
+
+  header h1 {
+    grid-column: 1;
+    margin: 0 auto;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+    text-align: center;
+  }
+
+
+  header img {
+    grid-column: 2;
+    justify-self: end;
+    max-width: 20vw;    /* at most 20% of viewport width */
+    max-height: 60px;   
+    width: auto;
+    height: auto;
+  }
+
+  @media (max-width: 600px) {
+    header {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      text-align: center;
+    }
+    header img {
+      grid-row: 1;
+      justify-self: center;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      grid-row: 2;
+      font-size: 2rem; 
+    }
+  }
+
+  /* les boutons societé, nom... */
+    .wave-group {
+      position: relative;
+      margin-bottom: 30px;
+      margin: 20px;
+    }
+
+    .wave-group .input {
+      font-size: 16px;
+      padding: 10px 10px 10px 5px;
+      display: block;
+      width: 200px;
+      border: none;
+      border-bottom: 1px solid #515151;
+      background: #EBEBFF;
+    }
+
+    .wave-group .input:focus {
+      outline: none;
+    }
+
+    .wave-group .label {
+      color: #999;
+      font-size: 18px;
+      font-weight: normal;
+      position: absolute;
+      pointer-events: none;
+      left: 5px;
+      top: 10px;
+      display: flex;
+    }
+
+    .wave-group .label-char {
+      transition: 0.2s ease all;
+      transition-delay: calc(var(--index) * .05s);
+    }
+
+    .wave-group .input:focus ~ label .label-char,
+    .wave-group .input:valid ~ label .label-char {
+      transform: translateY(-20px);
+      font-size: 14px;
+      color: #5264AE;
+    }
+
+    .wave-group .bar {
+      position: relative;
+      display: block;
+      width: 200px;
+    }
+
+    .wave-group .bar:before, .wave-group .bar:after {
+      content: '';
+      height: 2px;
+      width: 0;
+      bottom: 1px;
+      position: absolute;
+      background: #5264AE;
+      transition: 0.2s ease all;
+      -moz-transition: 0.2s ease all;
+      -webkit-transition: 0.2s ease all;
+    }
+
+    .wave-group .bar:before {
+      left: 50%;
+    }
+
+    .wave-group .bar:after {
+      right: 50%;
+    }
+
+    .wave-group .input:focus ~ .bar:before,
+    .wave-group .input:focus ~ .bar:after {
+      width: 50%;
+    }
+
+/* les box trimestres et actuel */
+    .input {
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      color: #555;
+      outline: none;
+      width: 100px;
+    }
+
+    .input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /*bouton de validation, reset... */
+
+
+    button {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      color: white;
+      padding: 1em 2em;
+      border: none;
+      border-radius: .6rem;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      width: 15%;
+    }
+
+    button span:not(:nth-child(6)) {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      transition: .6s ease;
+    }
+
+    button span:nth-child(6) {
+      position: relative;
+    }
+
+    button span:nth-child(1) {
+      transform: translate(-3.3em, -4em);
+    }
+
+    button span:nth-child(2) {
+      transform: translate(-6em, 1.3em);
+    }
+
+    button span:nth-child(3) {
+      transform: translate(-.2em, 1.8em);
+    }
+
+    button span:nth-child(4) {
+      transform: translate(3.5em, 1.4em);
+    }
+
+    button span:nth-child(5) {
+      transform: translate(3.5em, -3.8em);
+    }
+
+    button:hover span:not(:nth-child(6)) {
+      transform: translate(-50%, -50%) scale(4);
+      transition: 1.5s ease;
+    }
+
+    .submit-button {
+    background-color: #28a745; 
+  }
+
+  .submit-button span:not(:nth-child(6)) {
+    background-color: #218838; 
+  }
+
+  .reset-button {
+    background-color: #dc3545; 
+  }
+
+  .reset-button span:not(:nth-child(6)) {
+    background-color: #c82333; 
+  }
+
+  .roundup-button {
+    background-color: orange;
+  }
+
+  .roundup-button span:not(:nth-child(6)) {
+    background-color: darkorange;
+  }
+
+  .circle-button {
+    background-color: orange;
+    width: 100px;
+  }
+
+  .circle-button span:not(:nth-child(6)) {
+    background-color: darkorange; 
+  }
+
+  .calculer-button{
+    background-color: blue ;
+  }
+  .calculer-button span:not(:nth-child(6)) {
+    background-color: darkblue;
+  }
+
+/* text descriptif */
+
+    .form-description {
+      font-size: 1rem;
+      margin-bottom: 1.5em;
+      margin: 20px;
+    }
+
+  .form-description a {
+    color: #007bff;
+    text-decoration: underline;
+  }
+  .form-description a:hover {
+    opacity: 0.8;
+    color: blue
+  }
+
+
+
+/* boites trimestre */
+  .month-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.85rem;
+    gap: 10px;
+  }
+
+  .month-box label {
+    margin-bottom: 4px;
+    color: #333;
+  }
+
+
+  .form-row {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 1200px;
+    margin: 0px;
+  }
+
+  @media (max-width: 600px) {
+    .form-row { flex-direction: column; }
+  }
+
+
+/*icone */
+
+  #image-tooltip {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 999;
+    max-width: 300px;
+    max-height: 200px;
+  }
+
+  #image-tooltip img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+  }
+
+
+
+  .product-name {
+    position: relative;        
+    padding-left: 1.5em;       
+    display: inline-flex;      
+    align-items: center;
+    gap: 0.3em;              
+  }
+
+  .product-name::before {
+    content: "";
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: gray;    
+  }
+
+  
+  .product-name.aire-api::before  { background-color: #429246 !important; }
+  .product-name.aire-ape::before  { background-color: #86247c !important; }
+  .product-name.aire-atb::before  { background-color: #bf2722 !important; }
+  .product-name.aire-vit::before  { background-color: #f3b146 !important; }
+  .product-name.aire-try::before  { background-color: #fadc52 !important; }
+  .product-name.aire-vac::before  { background-color: #1d4f87 !important; }
+
+
+  .product-name img.animal-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+
+
+  /* legend container */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    align-items: center;
+    margin-bottom: 0.5em;
+    font-size: 0.9em;
+  }
+
+  /* each legend entry */
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+
+  /* the coloured circle of the legend */
+  .legend-item .dot {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: gray;
+  }
+
+  /* match your dot colours */
+  .legend-item.api  .dot { background-color: #429246; }
+  .legend-item.ape  .dot { background-color: #86247c; }
+  .legend-item.atb  .dot { background-color: #bf2722; }
+  .legend-item.vit  .dot { background-color: #f3b146; }
+  .legend-item.try  .dot { background-color: #fadc52; }
+  .legend-item.vac  .dot { background-color: #1d4f87; }
+
+  .legend-item.amm .legend-icon {
+    width: 1.6em;
+    height: auto;
+    vertical-align: middle;
+    margin-right: 0.3em;
+  }
+
+
+
+  .amm-icon {
+    width: 30px;
+    height: auto;
+    vertical-align: middle;
+    margin-right: 0.3em;
+  }
+
+  /* in your <style> block */
+  .new-icon {
+    width: 45px;
+    height: 35px;
+    object-fit: contain;
+    margin-right: 0.6em;
+  }
+
+    .hidden-col {
+    display: none;
+  }
+
+  /* warning si JS n'est pas installé */
+
+  .no-js-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 12px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+  
+
+
+
+
+  
+</style>
+</head>
+<body>
+ 
+  <!--l'entete -->
+  <header>
+    <h1>Planifiez vos commandes LOBS pour une année sans rupture</h1>
+    <a href="https://www.lobs.fr/" target="_blank" rel="noopener">
+      <img src="picture/logo_LOBS.png" alt="Logo LOBS International Health">
+    </a>
+  </header>
+
+   <noscript>
+    <div class="no-js-warning">
+      ⚠️ Pour pouvoir utiliser ce formulaire, merci d’activer JavaScript dans votre navigateur.
+    </div>
+  </noscript>
+
+  <form id="survey-form" style="margin-top: 20px;" action="https://formspree.io/f/xwpbokkq" method="POST">
+  <br>
+  <br>
+
+    <!--texte descriptif -->
+  <p class="form-description">
+    Chers partenaires,<br><br>
+    <strong>Afin de mieux anticiper vos besoins et garantir la disponibilité de nos produits, merci de renseigner vos prévisions de commandes annuelles.</strong> Veuillez indiquer vos besoins par trimestres (Jan-Mar, Avr-Jun, Jul-Sep, Oct-Dec) et la quantité annuelle se mettra à jour automatiquement. Si certains produits ont les mêmes besoins pour tous les trimestres, utilisez le bouton <strong>"Cliquez si qtés identiques"</strong> pour cette ligne et les quatres trimestres prendront la valeur du premier trimestre.<br><br>
+    La quantité annuelle se convertit automatiquement en nombre de cartons (colonne "Cartons"). Les valeurs non entières signalent un besoin partiel et le nombre de cartons sera surligné en orange : n’hésitez pas à ajuster vos prévisions pour obtenir un nombre de cartons entiers ou bien cliquer sur le bouton <strong>"Arrondir aux cartons"</strong>.<br><br>
+    Toutes les quantités saisies sont exprimées dans l'unité marqué dans la colonne "Qte par Carton" (seau, flacon, pot, coffret...).<br><br>
+    <strong>Le stock actuel, renseigné dans la colonne « Stock actuel », reflète vos réserves disponibles à ce jour : il nous permet d’ajuster notre production pour éviter ruptures et surstocks, et de garantir une continuité optimale de vos approvisionnements.</strong><br><br>
+    Enfin, cliquez sur le bouton<strong>"Valider ma prévision"</strong> pour nous transmettre vos estimations. <strong>Veuillez cliquer jusqu'a ce que vous soyez rediriger vers une page de remerciement ou nous ne reçevrons pas vos prévisions. </strong>Nous vous remercions de votre collaboration et restons à votre disposition pour toute question. <br><br>
+    Pour plus d'informations,
+    <a href="https://www.lobs.fr/" target="_blank" rel="noopener">
+      veuillez vous rendre ici.
+    </a>
+  </p>
+
+  <!--case societe, nom... -->
+
+  <div class="form-row">
+      <div class="wave-group">
+        <input type="text" class="input" name="society" required>
+        <span class="bar"></span>
+        <label class="label">
+          <span class="label-char" style="--index:0">S</span>
+          <span class="label-char" style="--index:1">o</span>
+          <span class="label-char" style="--index:2">c</span>
+          <span class="label-char" style="--index:3">i</span>
+          <span class="label-char" style="--index:4">é</span>
+          <span class="label-char" style="--index:5">t</span>
+          <span class="label-char" style="--index:6">é</span>
+        </label>
+      </div>
+      <div class="wave-group">
+        <input type="text" class="input" name="country" required>
+        <span class="bar"></span>
+        <label class="label">
+          <span class="label-char" style="--index:0">P</span>
+          <span class="label-char" style="--index:1">a</span>
+          <span class="label-char" style="--index:2">y</span>
+          <span class="label-char" style="--index:3">s</span>
+        </label>
+      </div>
+      <div class="wave-group">
+        <input type="email" class="input" name="_replyto" required>
+        <span class="bar"></span>
+        <label class="label">
+          <span class="label-char" style="--index:0">e</span>
+          <span class="label-char" style="--index:1">m</span>
+          <span class="label-char" style="--index:2">a</span>
+          <span class="label-char" style="--index:3">i</span>
+          <span class="label-char" style="--index:4">l</span>
+        </label>
+      </div>
+  </div>
+  <div class="form-row">
+    <div class="wave-group">
+      <input type="text" class="input" name="clientName" required>
+      <span class="bar"></span>
+      <label class="label">
+        <span class="label-char" style="--index:0">N</span>
+        <span class="label-char" style="--index:1">o</span>
+        <span class="label-char" style="--index:2">m</span>
+      </label>
+    </div>
+    <div class="wave-group">
+      <input type="text" class="input" name="ville" required>
+      <span class="bar"></span>
+      <label class="label">
+        <span class="label-char" style="--index:0">V</span>
+        <span class="label-char" style="--index:1">i</span>
+        <span class="label-char" style="--index:2">l</span>
+        <span class="label-char" style="--index:3">l</span>
+        <span class="label-char" style="--index:4">e</span>
+      </label>
+    </div>
+
+      <div class="wave-group">
+        <input type="text" class="input" name="whatsapp" required>
+        <span class="bar"></span>
+        <label class="label">
+          <span class="label-char" style="--index:0">W</span>
+          <span class="label-char" style="--index:1">h</span>
+          <span class="label-char" style="--index:2">a</span>
+          <span class="label-char" style="--index:3">t</span>
+          <span class="label-char" style="--index:4">s</span>
+          <span class="label-char" style="--index:5">A</span>
+          <span class="label-char" style="--index:6">p</span>
+          <span class="label-char" style="--index:7">p</span>
+        </label>
+      </div>
+  </div>
+  <!--legende-->
+    <div class="legend">
+      <div class="legend-item amm">
+        <img src="picture/AMM.png" alt="AMM" class="legend-icon">
+        AMM en UEMOA
+      </div>
+      <div class="legend-item api">
+        <span class="dot"></span>     
+        <a href="https://www.lobs.fr/categories-produits/antiparasitaires-internes" target="_blank" rel="noopener">
+          ANTIPARASITAIRES INTERNES
+        </a>
+      </div>
+      <div class="legend-item ape">
+        <span class="dot"></span> 
+        <a href="https://www.lobs.fr/categories-produits/antiparasitaires-externes" target="_blank" rel="noopener">
+          ANTIPARASITAIRES EXTERNES
+        </a> 
+      </div>
+      <div class="legend-item atb">
+        <span class="dot"></span> 
+        <a href="https://www.lobs.fr/categories-produits/anti-infectieux-et-assimiles" target="_blank" rel="noopener">
+          ANTI-INFECTIEUX OU ASSIMILÉS
+        </a>
+      </div>
+      <div class="legend-item vit">
+        <span class="dot"></span> 
+        <a href="https://www.lobs.fr/categories-produits/vitamines-mineraux" target="_blank" rel="noopener">
+          VITAMINES & MINÉRAUX
+        </a>
+      </div>
+      <div class="legend-item try">
+        <span class="dot"></span> 
+        <a href="https://www.lobs.fr/categories-produits/trypanocides" target="_blank" rel="noopener">
+          TRYPANOCIDES
+        </a>
+      </div>
+      <div class="legend-item vac">
+        <span class="dot"></span> 
+        <a href="https://www.lobs.fr/categories-produits/vaccins" target="_blank" rel="noopener">
+          VACCINS
+        </a>
+      </div>
+    </div>
+
+    <br>
+
+    <!--boutton arrondir au cartons-->
+
+    <button type="button" id="round-to-cartons" class="roundup-button">
+      <span class="circle1"></span>
+      <span class="circle2"></span>
+      <span class="circle3"></span>
+      <span class="circle4"></span>
+      <span class="circle5"></span>
+      <span class="text">Arrondir aux cartons</span>
+    </button>
+
+    <!--entete des tableaux-->
+
+    <table id="product-table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Stock actuel</th>
+          <th>Trimestre</th>
+          <th>Remplir</th>
+          <th>Quantité annuelle prévue</th>
+          <th>Cartons</th>
+          <th>Qte par Carton</th>
+          <th class ="hidden-col"> Poids</th>
+          <th class ="hidden-col"> Volumes</th>
+          <th class ="hidden-col"> Refrigerer</th>
+
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <br><br>
+
+    <input type="hidden" name="_next" value="https://aerostaz13.github.io/thank-you/thank_you.html">
+    <input type="hidden" name="_captcha" value="false">
+
+
+    <!--boutton valide et effacer-->
+    <button type="submit" class="submit-button">
+      <span class="circle1"></span><span class="circle2"></span><span class="circle3"></span>
+      <span class="circle4"></span><span class="circle5"></span><span class="text">Valider ma prévision</span>
+    </button>
+    <button type="reset" class="reset-button">
+      <span class="circle1"></span><span class="circle2"></span><span class="circle3"></span>
+      <span class="circle4"></span><span class="circle5"></span><span class="text">Effacer les champs</span>
+    </button>
+  </form>
+
+  <br>
+  <br>
+
+
+
+
+<!--disclaimer-->
+  <p class="form-description" style="color:grey; font-style:italic; margin: 20px;">
+    Les informations transmises seront utilisées avec la plus grande confidentialité. Elles représentent une estimation de vos besoins sur une année calendaire mais ne sont pas une confirmation de commande.
+  </p>
+
+  <div id="image-tooltip">
+    <img src="" alt="preview">
+  </div>
+
+  <script>
+
+    //Script
+    // const produits est la liste de tous les produits et leur caracteristique
+    const produits = [{"ID":"ALB25V_50","Product":"ALBEN 2500","Presentation":" \/ Seau de","Quantité":"50 boli verts","Qte_par_Carton":12.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.0564,"Poids":14.0,"Refrigerer":0.0},{"ID":"ALB25B_50","Product":"ALBEN  2500","Presentation":" \/ Seau de","Quantité":"50 boli blancs","Qte_par_Carton":12.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.0564,"Poids":14.0,"Refrigerer":0.0},{"ID":"ALB25V_5C","Product":"ALBEN 2500","Presentation":" \/ Seau de","Quantité":"500 boli","Qte_par_Carton":2.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.0595,"Poids":19.5,"Refrigerer":0.0},{"ID":"ALB25BL_50","Product":"ALBEN 2500 BLISTER","Presentation":"\/ Coffret de 5 Boîtes de 10 boli,","Quantité":"50 boli","Qte_par_Carton":10.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Coffret","Volume":0.0359,"Poids":12.5,"Refrigerer":1.0},{"ID":"ALB25_B2","Product":"ALBEN 2500 Boîte de 2 boli","Presentation":"\/ Coffret de 50 boîtes de 2 boli, soit","Quantité":"100 boli","Qte_par_Carton":6.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Coffret","Volume":0.0469,"Poids":15.5,"Refrigerer":0.0},{"ID":"ALB30_2K","Product":"ALBEN 300","Presentation":" \/ Seau de","Quantité":"2000 cps","Qte_par_Carton":2.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.0369,"Poids":15.0,"Refrigerer":0.0},{"ID":"ALB30BL_1C","Product":"ALBEN 300 Blister","Presentation":" \/ Coffret de 5 Boîtes de 20 boli,","Quantité":"100 cps","Qte_par_Carton":20.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Coffret","Volume":0.0355,"Poids":10.0,"Refrigerer":1.0},{"ID":"ALB30_1C","Product":"ALBEN 300","Presentation":" \/ Pot de","Quantité":"100 cps","Qte_par_Carton":40.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0368,"Poids":13.7,"Refrigerer":0.0},{"ID":"ALBCI_50","Product":"ALBEN CIBLE","Presentation":" \/ Boîte de 25 pochettes de 2 boli,","Quantité":"50 boli","Qte_par_Carton":20.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0594,"Poids":21.0,"Refrigerer":0.0},{"ID":"ALB10_1L","Product":"ALBEN 10%","Presentation":" \/ Flacon de","Quantité":"1  L","Qte_par_Carton":10.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.026,"Poids":12.5,"Refrigerer":0.0},{"ID":"ANTI_1C","Product":"ANTITIC ","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":100.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.035,"Poids":12.7,"Refrigerer":0.0},{"ID":"ANTI_250","Product":"ANTITIC ","Presentation":" \/ Flacon de","Quantité":"250ml","Qte_par_Carton":40.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.027,"Poids":12.7,"Refrigerer":0.0},{"ID":"ANTI_1L","Product":"ANTITIC ","Presentation":" \/ Flacon de","Quantité":"1  L","Qte_par_Carton":10.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.02,"Poids":13.2,"Refrigerer":0.0},{"ID":"BIO5_50","Product":"BIOCYCLINE 5%","Presentation":" \/ Flacon de","Quantité":"50ml","Qte_par_Carton":100.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.024,"Poids":12.0,"Refrigerer":0.0},{"ID":"BIO5_1C","Product":"BIOCYCLINE 5%","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"BIO10_50","Product":"BIOCYCLINE 10%","Presentation":" \/ Flacon de","Quantité":"50ml","Qte_par_Carton":100.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.024,"Poids":12.0,"Refrigerer":0.0},{"ID":"BIO10_1C","Product":"BIOCYCLINE 10%","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"BIO20_50","Product":"BIOCYCLINE 20%","Presentation":" \/ Flacon de","Quantité":"50ml","Qte_par_Carton":100.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.024,"Poids":12.0,"Refrigerer":0.0},{"ID":"BIO20_1C","Product":"BIOCYCLINE 20%","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"DELSE_20","Product":"DELTA LOBS SE ","Presentation":" \/ Flacon de","Quantité":"20ml","Qte_par_Carton":200.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.025,"Poids":6.7,"Refrigerer":1.0},{"ID":"DELSE_1C","Product":"DELTA LOBS SE ","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":100.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.03,"Poids":12.9,"Refrigerer":1.0},{"ID":"DELSE_1L","Product":"DELTA LOBS SE ","Presentation":" \/ Flacon de","Quantité":"1 L","Qte_par_Carton":10.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.024,"Poids":11.4,"Refrigerer":1.0},{"ID":"DELPO_5C","Product":"DELTA LOBS PO ","Presentation":" \/ Flacon double sortie de","Quantité":"500 ml","Qte_par_Carton":20.0,"Aires":"APE","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.015,"Poids":13.5,"Refrigerer":1.0},{"ID":"DISTO_1K","Product":"DISTOCUR","Presentation":" \/ Seau de","Quantité":"1000 boli","Qte_par_Carton":4.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.0361,"Poids":13.2,"Refrigerer":0.0},{"ID":"DISTO_1C","Product":"DISTOCUR","Presentation":" \/ Pot de","Quantité":"100 boli","Qte_par_Carton":40.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0368,"Poids":14.5,"Refrigerer":0.0},{"ID":"DOXYL_1C","Product":"DOXYLOBS 500","Presentation":"\/ Boîte de 25 sachets de 100g","Quantité":null,"Qte_par_Carton":8.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":0.0643,"Poids":23.5,"Refrigerer":0.0},{"ID":"DOXYL_1K","Product":"DOXYLOBS 500","Presentation":" \/ Pot de","Quantité":"1 Kg","Qte_par_Carton":18.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Pot","Volume":0.055,"Poids":21.0,"Refrigerer":0.0},{"ID":"FERL_1C","Product":"FERLOBSTRAN B12","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":60.0,"Aires":"VIT","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.023,"Poids":14.0,"Refrigerer":1.0},{"ID":"IVMEC_10","Product":"IVERMEC ","Presentation":" \/ Flacon de","Quantité":"10 ml","Qte_par_Carton":600.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":0,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Flacons","Volume":0.0334,"Poids":16.0,"Refrigerer":0.0},{"ID":"IVMEC_20","Product":"IVERMEC ","Presentation":" \/ Flacon de","Quantité":"20ml","Qte_par_Carton":400.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":0,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0405,"Poids":15.0,"Refrigerer":0.0},{"ID":"IVMEC_50","Product":"IVERMEC ","Presentation":"\/ Flacon plastique de","Quantité":"50ml","Qte_par_Carton":100.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":0,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.024,"Poids":8.0,"Refrigerer":0.0},{"ID":"IVMEC_1C","Product":"IVERMEC ","Presentation":" \/ Flacon plastique de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":0,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"LEV20_1C","Product":"LEVALOBS 200","Presentation":"\/ Boîte de 25 sachets de 100g","Quantité":null,"Qte_par_Carton":8.0,"Aires":"API","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0643,"Poids":23.5,"Refrigerer":0.0},{"ID":"LEV20_1K","Product":"LEVALOBS 200","Presentation":" \/ Pot de","Quantité":"1kg","Qte_par_Carton":18.0,"Aires":"API","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0485,"Poids":21.0,"Refrigerer":0.0},{"ID":"LOBCL_1C","Product":"LOBACALCIUM","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"VIT","vache":1,"volaille":1,"lapin":1,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":0.028,"Poids":18.0,"Refrigerer":1.0},{"ID":"LOBAX_1C","Product":"LOBAMAX VOLAILLE","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.021,"Poids":12.0,"Refrigerer":0.0},{"ID":"LOBAX_5C","Product":"LOBAMAX VOLAILLE","Presentation":" \/ Flacon de","Quantité":"500ml","Qte_par_Carton":24.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0177,"Poids":15.0,"Refrigerer":0.0},{"ID":"LOBAX_5L","Product":"LOBAMAX VOLAILLE","Presentation":" \/ Bidon de","Quantité":"5L","Qte_par_Carton":4.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0353,"Poids":23.0,"Refrigerer":0.0},{"ID":"LOBAXR_10C","Product":"LOBAMAX RUMINANTS","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":1,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":0.0},{"ID":"LOBAXR_25C","Product":"LOBAMAX RUMINANTS","Presentation":" \/ Flacon de","Quantité":"250ml","Qte_par_Carton":40.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":1,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":0.0},{"ID":"LOBAXR_50C","Product":"LOBAMAX RUMINANTS","Presentation":" \/ Flacon de","Quantité":"500ml","Qte_par_Carton":24.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":1,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":0.0},{"ID":"LOBLA_CO","Product":"LOBAMIN LAYERS","Presentation":" \/ Coffret de","Quantité":"25 sachets de 150g + 5 sachets 15g","Qte_par_Carton":4.0,"Aires":"VIT","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":0.0484,"Poids":17.0,"Refrigerer":1.0},{"ID":"LOBLA_1K","Product":"LOBAMIN LAYERS","Presentation":" \/ Pot de","Quantité":"1kg","Qte_par_Carton":18.0,"Aires":"VIT","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Pot","Volume":0.0485,"Poids":21.0,"Refrigerer":1.0},{"ID":"LPHEN_1C","Product":"LOBAPHEN","Presentation":" \/ Pot de","Quantité":"100 boli","Qte_par_Carton":4.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Pot","Volume":0.0284,"Poids":14.0,"Refrigerer":0.0},{"ID":"LOBAINJ_1C","Product":"LOBAVIT INJECTABLE","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"VIT","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":1,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":0.028,"Poids":18.0,"Refrigerer":1.0},{"ID":"LOBA+_15","Product":"LOBAVIT PLUS","Presentation":"\/ Boîte de 100","Quantité":"sachet de 15g","Qte_par_Carton":10.0,"Aires":"VIT","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.07,"Poids":18.5,"Refrigerer":1.0},{"ID":"LOBAV_1C","Product":"LOBAVIT VOLAILLE","Presentation":" \/ Boîte de","Quantité":"25 sachets de 100 gr","Qte_par_Carton":8.0,"Aires":"VIT","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0643,"Poids":23.5,"Refrigerer":1.0},{"ID":"LOBAV_1K","Product":"LOBAVIT VOLAILLE","Presentation":" \/ Pot de","Quantité":"1kg","Qte_par_Carton":18.0,"Aires":"VIT","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0485,"Poids":21.0,"Refrigerer":1.0},{"ID":"LOBAZ_GD","Product":"LOBAZEN","Presentation":" \/ Boîte de 10 sachets de","Quantité":"23,6 g","Qte_par_Carton":50.0,"Aires":"TRY","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.1,"Poids":19.0,"Refrigerer":0.0},{"ID":"LOBAZ_PT","Product":"LOBAZEN","Presentation":" \/ Boîte de 10 sachets de","Quantité":"2,36 g","Qte_par_Carton":200.0,"Aires":"TRY","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.097,"Poids":15.0,"Refrigerer":0.0},{"ID":"LOBZ+_GD","Product":"LOBAZEN PLUS","Presentation":" \/ Boîte de 10 sachets de","Quantité":"23,9 g","Qte_par_Carton":50.0,"Aires":"TRY","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.1,"Poids":19.0,"Refrigerer":1.0},{"ID":"LOBZ+_PT","Product":"LOBAZEN PLUS","Presentation":" \/ Boîte de 10 sachets de","Quantité":"2,39 g","Qte_par_Carton":200.0,"Aires":"TRY","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.097,"Poids":15.0,"Refrigerer":1.0},{"ID":"LOBIC25_1C","Product":"LOBICOX","Presentation":" \/ Boîte de","Quantité":"25 sachets de 100 gr","Qte_par_Carton":4.0,"Aires":"API","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0385,"Poids":12.0,"Refrigerer":0.0},{"ID":"LOBIC_1K","Product":"LOBICOX","Presentation":" \/ Boîte de","Quantité":"10 sachets de 100 gr","Qte_par_Carton":10.0,"Aires":"API","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.057,"Poids":14.1,"Refrigerer":0.0},{"ID":"LOBIC15_10","Product":"LOBICOX","Presentation":" \/ Boîte de","Quantité":"100 sachets de 15 gr","Qte_par_Carton":10.0,"Aires":"API","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0695,"Poids":18.0,"Refrigerer":0.0},{"ID":"LOBIC10_1C","Product":"LOBICOX","Presentation":" \/ Pot de","Quantité":"1kg","Qte_par_Carton":18.0,"Aires":"API","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0485,"Poids":21.0,"Refrigerer":0.0},{"ID":"LOBID_SA","Product":"LOBIDIUM","Presentation":" \/ Boîte de 10 sachets de","Quantité":"1g","Qte_par_Carton":200.0,"Aires":"TRY","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":0,"Chameaux":1,"Chien":1,"AMM":1,"Unité":"Boîte","Volume":0.0582,"Poids":12.5,"Refrigerer":1.0},{"ID":"LOBID+_SA","Product":"LOBIDIUM PLUS","Presentation":"\/ Boîte de 10 sachets monodose","Quantité":null,"Qte_par_Carton":200.0,"Aires":"TRY","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":0,"Chameaux":1,"Chien":1,"AMM":1,"Unité":"Boîte","Volume":0.0573,"Poids":9.5,"Refrigerer":1.0},{"ID":"LOBIF_CO","Product":"LOBIFUGE VOLAILLE","Presentation":" \/ Coffret de 10 boîtes de","Quantité":"100 cps","Qte_par_Carton":10.0,"Aires":"API","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Coffret","Volume":0.0345,"Poids":6.0,"Refrigerer":1.0},{"ID":"LVACN_40","Product":"LOBIVAC NEW","Presentation":" \/ Flacon de 40 doses,","Quantité":"20ml","Qte_par_Carton":550.0,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.081,"Poids":19.8,"Refrigerer":1.0},{"ID":"LVACN_1C","Product":"LOBIVAC NEW","Presentation":" \/ Flacon de 100 doses,","Quantité":"50ml","Qte_par_Carton":232.0,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0814,"Poids":19.3,"Refrigerer":1.0},{"ID":"LVACN_1K","Product":"LOBIVAC NEW","Presentation":" \/ Flacon de 1000 doses,","Quantité":"500ml","Qte_par_Carton":30.0,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.07,"Poids":19.87,"Refrigerer":1.0},{"ID":"LIVEAIN_1K","Product":"LOBIVAC AI NEW ","Presentation":" \/ Flacon de 1000 doses,","Quantité":"250ml","Qte_par_Carton":60.0,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.081,"Poids":21.0,"Refrigerer":1.0},{"ID":"LIVEAIN_2K","Product":"LOBIVAC AI NEW ","Presentation":" \/ Flacon de 2000 doses,","Quantité":"500ml","Qte_par_Carton":30.0,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.033,"Poids":18.87,"Refrigerer":1.0},{"ID":"LOBZL1_1C","Product":"LOBIZOL 1000","Presentation":" \/ Pot  de","Quantité":"100 boli","Qte_par_Carton":400.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0408,"Poids":20.5,"Refrigerer":0.0},{"ID":"LOBZL3_25K","Product":"LOBIZOL 300","Presentation":" \/ Seau de","Quantité":"2500 boli","Qte_par_Carton":2.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Seau","Volume":0.049619,"Poids":15.0,"Refrigerer":0.0},{"ID":"LOBZL3_1C","Product":"LOBIZOL 300","Presentation":" \/ Pot  de","Quantité":"100 boli","Qte_par_Carton":40.0,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0284,"Poids":13.5,"Refrigerer":0.0},{"ID":"LOSPRY_21","Product":"LOBSPRAY","Presentation":" \/ Spray de","Quantité":"210ml","Qte_par_Carton":24.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Spray","Volume":0.0208,"Poids":7.1,"Refrigerer":1.0},{"ID":"LOBUMX_60","Product":"LOBUVIT MAXI","Presentation":" \/ Boîte de","Quantité":"60 boli","Qte_par_Carton":16.0,"Aires":"VIT","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0313,"Poids":17.0,"Refrigerer":1.0},{"ID":"LOBUMN_1C","Product":"LOBUVIT MINI","Presentation":" \/ Boîte de","Quantité":"100 boli","Qte_par_Carton":20.0,"Aires":"VIT","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":1,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0222,"Poids":9.5,"Refrigerer":1.0},{"ID":"MAXICO_1C","Product":"MAXICOVIT","Presentation":" \/ Coffret de 10 boîtes de","Quantité":"100 cps","Qte_par_Carton":10.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Coffret","Volume":0.0301,"Poids":8.5,"Refrigerer":1.0},{"ID":"MAXIL25_1C","Product":"MAXI LAYER ","Presentation":" \/ Boîte de","Quantité":"25 sachets de 100 gr","Qte_par_Carton":8.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0643,"Poids":24.5,"Refrigerer":1.0},{"ID":"MAXIL100_10","Product":"MAXI LAYER ","Presentation":" \/ Boîte de","Quantité":"10 sachets de 100 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.037,"Poids":14.1,"Refrigerer":1.0},{"ID":"MAXIL100_15","Product":"MAXI LAYER ","Presentation":" \/ Boîte de","Quantité":"100 sachets de 15 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0696,"Poids":18.5,"Refrigerer":1.0},{"ID":"MAXIL_1K","Product":"MAXI LAYER ","Presentation":" \/ Pot de","Quantité":"1kg","Qte_par_Carton":18.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0485,"Poids":21.6,"Refrigerer":1.0},{"ID":"OXY50_25","Product":"OXYMEG 50","Presentation":" \/ Boîte de","Quantité":"25 sachets de 100 gr","Qte_par_Carton":4.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0316,"Poids":12.0,"Refrigerer":0.0},{"ID":"OXY50_1C","Product":"OXYMEG 50","Presentation":" \/ Boîte de","Quantité":"10 sachets de 100 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0367,"Poids":14.1,"Refrigerer":0.0},{"ID":"OXY50_10","Product":"OXYMEG 50","Presentation":" \/ Boîte de","Quantité":"100 sachets de 15 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0695,"Poids":18.0,"Refrigerer":0.0},{"ID":"OXY50_1K","Product":"OXYMEG 50","Presentation":" \/ Pot de","Quantité":"1 kg","Qte_par_Carton":18.0,"Aires":"ATB","vache":0,"volaille":1,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":0.0485,"Poids":21.0,"Refrigerer":0.0},{"ID":"PENIF_4M","Product":"PENI FORTE 4 MEGA","Presentation":" \/ Boîte de","Quantité":"10 flacons","Qte_par_Carton":600.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":0.05,"Poids":23.0,"Refrigerer":0.0},{"ID":"STRE_1C","Product":"STREPEN MAXI ","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":0.0243,"Poids":18.0,"Refrigerer":1.0},{"ID":"SULFA33_1C","Product":"SULFA LOBS 33","Presentation":" \/ Flacon de","Quantité":"100ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":1,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"SULFA33_5C","Product":"SULFA LOBS 33","Presentation":" \/ Flacon de","Quantité":"500ml","Qte_par_Carton":25.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":1,"mouton":1,"chevre":1,"cheval":1,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":0.0236,"Poids":13.0,"Refrigerer":0.0},{"ID":"TYDOX_1C25","Product":"TYL-DOX ","Presentation":" \/ Boîte de","Quantité":"25 sachets de 100 gr","Qte_par_Carton":4.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0316,"Poids":12.0,"Refrigerer":0.0},{"ID":"TYDOX_1C10","Product":"TYL-DOX ","Presentation":" \/ Boîte de","Quantité":"10 sachets de 100 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0367,"Poids":12.0,"Refrigerer":0.0},{"ID":"TYDOX_10","Product":"TYL-DOX ","Presentation":" \/ Boîte de","Quantité":"100 sachets de 15 gr","Qte_par_Carton":10.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Boîte","Volume":0.0696,"Poids":18.0,"Refrigerer":0.0},{"ID":"TYDOX_1K","Product":"TYL-DOX ","Presentation":" \/ Pot de","Quantité":"1Kg","Qte_par_Carton":18.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":null,"Poids":null,"Refrigerer":0.0},{"ID":"TYDOX_5K","Product":"TYL-DOX ","Presentation":" \/ Pot de","Quantité":"5Kg","Qte_par_Carton":4.0,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Pot","Volume":null,"Poids":null,"Refrigerer":0.0},{"ID":"TYLOF_1C","Product":"TYLO FORT 200","Presentation":" \/ Flacon de","Quantité":"100 ml","Qte_par_Carton":80.0,"Aires":"ATB","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":1,"Chameaux":1,"Chien":1,"AMM":1,"Unité":"Flacon","Volume":0.0319,"Poids":18.0,"Refrigerer":0.0},{"ID":"TYOX_1C","Product":"TYL-OX","Presentation":"\/ Boîte de ","Quantité":"25 sachets de 100g","Qte_par_Carton":null,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"TYOX_1K","Product":"TYL-OX","Presentation":" \/ Pot de","Quantité":"1 Kg","Qte_par_Carton":null,"Aires":"ATB","vache":1,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Pot","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOXI_50","Product":"LOXINIL 25","Presentation":" \/ Flacon de","Quantité":"50ml","Qte_par_Carton":null,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOXI_25C","Product":"LOXINIL 25","Presentation":" \/ Flacon de","Quantité":"250ml","Qte_par_Carton":null,"Aires":"API","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PERISR_100","Product":"PERIBOVAC T1-SR","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PERISR_50","Product":"PERIBOVAC T1-SR","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PERI44_100","Product":"PERIBOVAC T1-44","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PERI44_50","Product":"PERIBOVAC T1-44","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PAST_BO_50","Product":"PASTEVAC BOVIN","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"PAST_OVCA_50","Product":"PASTEVAC OVIN\/CAPRIN","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SYMP_50","Product":"SYMPTEVAC","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_PPR_100","Product":"LOBALIVE PPR","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_PPR_50","Product":"LOBALIVE PPR","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":1,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_DNC_50","Product":"LOBALIVE DNCB","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_DNC_100","Product":"LOBALIVE DNCB","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_ANT_100","Product":"LOBALIVE ANTHRAX","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_ANT_50","Product":"LOBALIVE ANTHRAX","Presentation":" \/ Flacon de 50 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":1,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_SG_POX_100","Product":"LOBALIVE SG POX","Presentation":" \/ Flacon de 100 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":1,"chevre":1,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_IBD_1000","Product":"LOBALIVE IBD \/ (Gumboro B87)","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_IBD_T_1000","Product":"LOBALIVE IBD T \/ (Thermostable) B87","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_NEW_IB_1000","Product":"LOBALIVE NEW + IB \/ (LaSota + H120) ","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_A_POX_1000","Product":"LOBALIVE A POX \/ (Quail adapted)","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_IB_1000","Product":"LOBALIVE IB \/ (H120)","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBA_NEW_1000","Product":"LOBALIVE NEW \/ (LaSota)","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBI_AI_NEW_1000","Product":"LOBIVAC AI-NEW \/ (H9N2 + LaSota inactivé)","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBI_COR_1000","Product":"LOBIVAC COR A B C \/ inactivé","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBI_EDS_1000","Product":"LOBIVAC EDS \/ inactivé","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBI_NEW_EDS_1000","Product":"LOBIVAC NEW EDS\/ (LaSota) inactivé","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"LOBI_NEW_IB_EDS_AI_1000","Product":"LOBIVAC NEW IB EDS AI \/ (LaSota + M41 + L +H9N2) inactivé","Presentation":" - Boîte de 10 flacons de 1000 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":1,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Boîte","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC JUNIOR","Presentation":null,"Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC 8 DHPPiL","Presentation":null,"Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC RAGE","Presentation":" \/ 1 dose","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC RAGE","Presentation":" \/ 12 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC RAGE","Presentation":" \/ 60 doses","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":null,"Product":"LOBIVAC DHPPiL + R","Presentation":null,"Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":0,"Chameaux":0,"Chien":1,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_EDT_50","Product":"SUIVAC EDT","Presentation":"\/ Flacon de 50ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_EDT_1C","Product":"SUIVAC EDT","Presentation":"\/ Flacon de 100ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_APP_50","Product":"SUIVAC APP","Presentation":"\/ Flacon de 50ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_APP_1C","Product":"SUIVAC APP","Presentation":"\/ Flacon de 100ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_ERY_IN_50","Product":"SUIVAC ERY IN","Presentation":"\/ Flacon de 50ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_ERY_IN_1C","Product":"SUIVAC ERY IN","Presentation":"\/ Flacon de 100ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_PAR_ERY_IN_50","Product":"SUIVAC PARVO ERY IN","Presentation":"\/ Flacon de 50ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_PAR_ERY_IN_1C","Product":"SUIVAC PARVO ERY IN","Presentation":"\/ Flacon de 100ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_DNT_50","Product":"SUIVAC DNT","Presentation":"\/ Flacon de 50ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null},{"ID":"SUIV_DNT_1C","Product":"SUIVAC DNT","Presentation":"\/ Flacon de 100ml","Quantité":null,"Qte_par_Carton":null,"Aires":"VAC","vache":0,"volaille":0,"lapin":0,"mouton":0,"chevre":0,"cheval":0,"porc":1,"Chameaux":0,"Chien":0,"AMM":0,"Unité":"Flacon","Volume":null,"Poids":null,"Refrigerer":null}]
+    
+    const tbody = document.querySelector('#product-table tbody');
+    const monthAbbr = ['Jan - Mar','Avr - Jun','Jul - Sep','Oct - Dec'];
+
+    // Creer les lignes du tableau et les classer par aires therapeutiques
+
+    produits.sort((a,b)=>a.Aires.localeCompare(b.Aires)); //classe par aires
+    produits.forEach((prod,index) => {
+      const row = document.createElement('tr');
+      const isRefrig = Boolean(prod.Refrigerer);
+      row.classList.add(`aire-${prod.Aires.toLowerCase()}`);
+      row.innerHTML = `
+        <td><span class="product-name" data-image="picture/${prod.ID}.png">${prod.Product} ${prod.Presentation} ${prod.Quantité}</span></td>
+        <td><input type="number" autocomplete="off" name="actual_${index}" class="input" value="0" min="0"></td>
+        <td><div id="monthly_${index}" class="monthly-input">
+          ${monthAbbr.map((abbr,m) => `
+            <div class="month-box">
+              <label for="m_${index}_${m}">${abbr}</label>
+              <input type="number" id="m_${index}_${m}" name="m_${index}_${m}" min="0" value="0" style="width:60px">
+            </div>
+          `).join('')}
+        </div></td>
+        <td>
+            <button type="button" class="circle-button">
+              <span class="circle1"></span><span class="circle2"></span><span class="circle3"></span>
+              <span class="circle4"></span><span class="circle5"></span><span class="text">Cliquez si qtés identiques</span>
+            </button>
+        </td>
+        <td><span id="annual_${index}">0</span></td>
+        <td><i><span id="boxes_${index}">0.00</span></i></td>
+        <td><i>${prod.Qte_par_Carton}<br>${prod.Unité}</i></td>
+        <td class = "hidden-col"> ${prod.Poids}</td>
+        <td class = "hidden-col">${prod.Volume}</td>
+        <td class = "hidden-col"> 
+          <input
+            type="checkbox"
+            id="prod-refrig-${index}"
+            ${isRefrig ? "checked" : ""}
+            disabled
+          />
+        </td>
+      `;
+
+      // La liste des ID de produits recevant l'icone NEW et l'attribution
+      if (["LOBAX_1C","LOBAX_5C","LOBAX_5L","LOBAXRS_25C","LOBAXR_10C","LOBAXR_25C","LOBAXR_50C"].includes(prod.ID)) {
+        const td = row.children[0];
+        const img = document.createElement('img');
+        img.src = 'picture/NEW.png'; img.alt = 'Nouveau'; img.className = 'new-icon';
+        td.insertBefore(img, td.firstChild);
+      }
+      // ON rajoute une icone AMM  si AMM = 1 dans produits
+      if (prod.AMM === 1) {
+        const span = row.querySelector('.product-name');
+        const img = document.createElement('img');
+        img.src = 'picture/AMM.png'; img.alt = 'AMM'; img.className = 'amm-icon';
+        span.parentNode.insertBefore(img, span);
+      }
+      const nameSpan = row.querySelector('.product-name');
+      if (nameSpan) {
+      nameSpan.classList.add(`aire-${prod.Aires.toLowerCase()}`);
+      }
+      // si l'entree pour animal = 1 alors icone de cet animal sera affiche pour le produits si 0 pas affiche
+      ['vache','volaille','lapin','mouton','chevre','cheval','porc','Chameaux','Chien'].forEach(key => {
+        if (prod[key] === 1) {
+          const span = row.querySelector('.product-name');
+          const img = document.createElement('img');
+          img.src = `picture/${key}.png`; img.alt = key; img.className = 'animal-icon';
+          span.appendChild(img);
+        }
+      });
+
+      //fonctionnement du bouton AUTOREMPLIR
+
+        const remplirBtn = row.querySelector('.circle-button');
+        remplirBtn.addEventListener('click', () => {
+          const firstTrim = monthlyInputs[0].value || 0;
+          monthlyInputs.forEach(input => input.value = firstTrim);
+          calculateBoxes();
+        });
+      tbody.appendChild(row);
+
+      const monthlyDiv = row.querySelector(`#monthly_${index}`);
+      const annualSpan = row.querySelector(`#annual_${index}`);
+      const boxOutput = row.querySelector(`#boxes_${index}`);
+      const quantityPerCarton = parseInt(prod.Qte_par_Carton, 10);
+      const monthlyInputs = monthlyDiv.querySelectorAll('input');
+
+      // affichage dynamique des cartons
+
+      function calculateBoxes() {
+        let total = 0;
+        monthlyInputs.forEach(i => total += parseInt(i.value) || 0);
+        annualSpan.textContent = total;
+        const boxes = total / quantityPerCarton;
+        boxOutput.textContent = boxes.toFixed(2);
+        if (boxes !== Math.floor(boxes) && total !== 0) boxOutput.classList.add('incomplete-box');
+        else boxOutput.classList.remove('incomplete-box');
+      }
+      monthlyInputs.forEach(i => i.addEventListener('input', calculateBoxes));
+    });
+
+    // FONCTIONNEMET DU BOUTON POUR ARRONDIR LES CARTONS
+    document.getElementById('round-to-cartons').addEventListener('click', () => {
+      produits.forEach((prod, i) => {
+        const perCarton = parseInt(prod.Qte_par_Carton, 10);
+        const monthlyInputs = document.querySelectorAll(`#monthly_${i} input`);
+        let sum = 0;
+        monthlyInputs.forEach(input => {
+          const qty = parseInt(input.value, 10) || 0;
+          const boxes = Math.ceil(qty / perCarton);
+          const rounded = boxes * perCarton;
+          input.value = rounded;
+          sum += rounded;
+        });
+        document.getElementById(`annual_${i}`).textContent = sum;
+        const totalBoxes = sum / perCarton;
+        const boxSpan = document.getElementById(`boxes_${i}`);
+        boxSpan.textContent = totalBoxes.toFixed(2);
+        if (totalBoxes !== Math.floor(totalBoxes) && sum !== 0) boxSpan.classList.add('incomplete-box');
+        else boxSpan.classList.remove('incomplete-box');
+      });
+    });
+
+    // RECUPERER LES DONNEES VIA FORMSPREE
+    const form = document.getElementById('survey-form');
+
+    form.addEventListener('reset', function() {
+      produits.forEach((_, i) => {
+        document.getElementById(`annual_${i}`).textContent = '0';
+        document.getElementById(`boxes_${i}`).textContent = '0.00';
+      });
+    });
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const productsData = produits.map((prod, i) => {
+        const monthlyInputs = Array.from(document.querySelectorAll(`#monthly_${i} input`));
+        const monthly = monthlyInputs.map(input => Number(input.value) || 0);
+        const totalQty = monthly.reduce((s, v) => s + v, 0);
+        const boxes = prod.Qte_par_Carton > 0 ? Number((totalQty / prod.Qte_par_Carton).toFixed(2)) : 0;
+        const actual = Number(form[`actual_${i}`].value) || 0;
+
+        return { id: prod.ID, product: prod.Product.trim(),actual, annual: totalQty, monthly, boxes };
+      });
+
+    const recapRows = productsData
+      .filter(p => p.annual > 0 || p.actual > 0)
+      .map(p =>
+        `<tr>
+          <td>${p.product}</td>
+          <td style="text-align:center">${p.actual}</td>
+          <td style="text-align:center">${p.monthly[0]}</td>
+          <td style="text-align:center">${p.monthly[1]}</td>
+          <td style="text-align:center">${p.monthly[2]}</td>
+          <td style="text-align:center">${p.monthly[3]}</td>
+          <td style="text-align:center">${p.annual}</td>
+          <td style="text-align:center">${p.boxes}</td>
+        </tr>`
+      )
+      .join('');
+
+    const recapTable = `
+      <h2>Récapitulatif de vos prévisions</h2>
+      <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Stock Actuel</th>
+            <th>Q1 (Jan–Mar)</th>
+            <th>Q2 (Avr–Jun)</th>
+            <th>Q3 (Jul–Sep)</th>
+            <th>Q4 (Oct–Dec)</th>
+            <th>Total annuel</th>
+            <th>Cartons</th>
+          </tr>
+        </thead>
+        <tbody>${recapRows}</tbody>
+      </table>
+      `;
+
+    const payload = new FormData();
+      ['clientName','society','country','ville','_replyto','whatsapp'].forEach(field => {
+        payload.set(field, form[field].value);
+      });
+      payload.set('products', JSON.stringify(productsData));
+      payload.set('_next', form._next.value);
+
+
+
+
+
+    emailjs.send('service_jqo1ofc', 'template_rxtdtfa', {
+        to_email: form._replyto.value,
+        clientName: form.clientName.value,
+        forecastJSON: JSON.stringify(productsData, null, 2),
+        order_recap_html: recapTable
+    })
+
+    .catch(err => {
+      console.warn('EmailJS a échoué, on continue malgré tout :', err);
+      alert('⚠️ Impossible d’envoyer le mail de récapitulatif, mais vos prévisions seront transmises.');
+    })
+    .finally(() => {
+      // 2) Toujours lancer la soumission Formspree
+      fetch(form.action, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Accept': 'application/json' },
+        body: payload
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = form._next.value;
+          } else {
+            return response.json().then(j => { throw new Error(j.error || 'Erreur serveur'); });
+          }
+        })
+        .catch(err => {
+          alert('❌ Échec de l’envoi des prévisions : ' + err.message);
+        });
+      });
+    });
+
+      // Tooltip for product images
+      const tooltip = document.getElementById('image-tooltip');
+      const tooltipImg = tooltip.querySelector('img');
+      document.querySelectorAll('.product-name').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const imgSrc = el.dataset.image; if (!imgSrc) return;
+          tooltipImg.src = imgSrc;
+          tooltip.style.display = 'block';
+          const rect = el.getBoundingClientRect();
+          tooltip.style.left = rect.right + window.scrollX + 'px';
+          // juste après avoir fait tooltip.style.display = 'block' et lu rect
+          const tooltipHeight = tooltip.offsetHeight;      
+          const margin = 8;                              
+
+
+          const top = rect.top + window.scrollY - tooltipHeight - margin;
+          tooltip.style.top = `${top}px`;
+
+        });
+        el.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+      });
+
+      //l'entete qui gele
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const headerHeight = document.querySelector('header').offsetHeight;
+        document.querySelectorAll('#product-table thead th').forEach(th => {
+          th.style.position = 'sticky';
+          th.style.top = headerHeight + 'px';
+          th.style.backgroundColor = 'whitesmoke';
+          th.style.zIndex = 2;
+        });
+      });
+
+
+
+
+
+  </script>
+</body>
+</html>
